@@ -26,37 +26,34 @@ public class GroupController {
     @ApiImplicitParam(name = "groupForm", value = "新增用户组form表单", required = true, dataType = "GroupForm")
     @PostMapping
     public Result add(@Valid @RequestBody GroupForm groupForm) {
-        log.info("name:", groupForm);
-        Group group = groupForm.toPo(Group.class);
-        return Result.success(groupService.add(group));
+        log.debug("name:{}", groupForm);
+        return Result.success(groupService.add(groupForm.toPo(Group.class)));
     }
 
     @ApiOperation(value = "删除用户组", notes = "根据url的id来指定删除对象")
-    @ApiImplicitParam(paramType = "path", name = "id", value = "用户组ID", required = true, dataType = "long")
+    @ApiImplicitParam(paramType = "path", name = "id", value = "用户组ID", required = true, dataType = "string")
     @DeleteMapping(value = "/{id}")
-    public Result delete(@PathVariable long id) {
-        groupService.delete(id);
-        return Result.success();
+    public Result delete(@PathVariable String id) {
+        return Result.success(groupService.delete(id));
     }
 
     @ApiOperation(value = "修改用户组", notes = "修改指定用户组信息")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "id", value = "用户组ID", required = true, dataType = "long"),
+            @ApiImplicitParam(name = "id", value = "用户组ID", required = true, dataType = "string"),
             @ApiImplicitParam(name = "groupForm", value = "用户组实体", required = true, dataType = "GroupForm")
     })
     @PutMapping(value = "/{id}")
-    public Result update(@PathVariable long id, @Valid @RequestBody GroupForm groupForm) {
+    public Result update(@PathVariable String id, @Valid @RequestBody GroupForm groupForm) {
         Group group = groupForm.toPo(Group.class);
         group.setId(id);
-        groupService.update(group);
-        return Result.success();
+        return Result.success(groupService.update(group));
     }
 
     @ApiOperation(value = "获取用户组", notes = "获取指定用户组信息")
-    @ApiImplicitParam(paramType = "path", name = "id", value = "用户组ID", required = true, dataType = "long")
+    @ApiImplicitParam(paramType = "path", name = "id", value = "用户组ID", required = true, dataType = "string")
     @GetMapping(value = "/{id}")
-    public Result get(@PathVariable long id) {
-        log.info("get with id:{}", id);
+    public Result get(@PathVariable String id) {
+        log.debug("get with id:{}", id);
         return Result.success(groupService.get(id));
     }
 
@@ -67,7 +64,7 @@ public class GroupController {
     )
     @GetMapping
     public Result query(@RequestParam String name) {
-        log.info("query with name:{}", name);
+        log.debug("query with name:{}", name);
         GroupQueryParam groupQueryParam = new GroupQueryParam();
         groupQueryParam.setName(name);
         return Result.success(groupService.query(groupQueryParam));
@@ -80,15 +77,15 @@ public class GroupController {
     )
     @PostMapping(value = "/conditions")
     public Result search(@Valid @RequestBody GroupQueryForm groupQueryForm) {
-        log.info("search with groupQueryForm:", groupQueryForm);
+        log.debug("search with groupQueryForm:{}", groupQueryForm);
         return Result.success(groupService.query(groupQueryForm.toParam(GroupQueryParam.class)));
     }
 
     @ApiOperation(value = "根据父id查询用户组", notes = "根据父id查询用户组列表")
-    @ApiImplicitParam(paramType = "path", name = "id", value = "用户组父ID", required = true, dataType = "long")
+    @ApiImplicitParam(paramType = "path", name = "id", value = "用户组父ID", required = true, dataType = "string")
     @GetMapping(value = "/parent/{id}")
-    public Result search(@PathVariable long id) {
-        log.info("query with parent id:", id);
+    public Result search(@PathVariable String id) {
+        log.debug("query with parent id:{}", id);
         return Result.success(groupService.queryByParentId(id));
     }
 }

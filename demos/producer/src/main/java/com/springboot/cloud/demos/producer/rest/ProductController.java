@@ -26,36 +26,34 @@ public class ProductController {
     @ApiImplicitParam(name = "productForm", value = "新增产品form表单", required = true, dataType = "ProductForm")
     @PostMapping
     public Result add(@Valid @RequestBody ProductForm productForm) {
-        log.info("name:", productForm);
+        log.info("name:{}", productForm);
         Product product = productForm.toPo(Product.class);
         return Result.success(productService.add(product));
     }
 
     @ApiOperation(value = "删除产品", notes = "根据url的id来指定删除对象")
-    @ApiImplicitParam(paramType = "path", name = "id", value = "产品ID", required = true, dataType = "long")
+    @ApiImplicitParam(paramType = "path", name = "id", value = "产品ID", required = true, dataType = "string")
     @DeleteMapping(value = "/{id}")
-    public Result delete(@PathVariable long id) {
-        productService.delete(id);
-        return Result.success();
+    public Result delete(@PathVariable String id) {
+        return Result.success(productService.delete(id));
     }
 
     @ApiOperation(value = "修改产品", notes = "修改指定产品信息")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "id", value = "产品ID", required = true, dataType = "long"),
+            @ApiImplicitParam(name = "id", value = "产品ID", required = true, dataType = "string"),
             @ApiImplicitParam(name = "productForm", value = "产品实体", required = true, dataType = "ProductForm")
     })
     @PutMapping(value = "/{id}")
-    public Result update(@PathVariable long id, @Valid @RequestBody ProductForm productForm) {
+    public Result update(@PathVariable String id, @Valid @RequestBody ProductForm productForm) {
         Product product = productForm.toPo(Product.class);
         product.setId(id);
-        productService.update(product);
-        return Result.success();
+        return Result.success(productService.update(product));
     }
 
     @ApiOperation(value = "获取产品", notes = "获取指定产品信息")
-    @ApiImplicitParam(paramType = "path", name = "id", value = "产品ID", required = true, dataType = "long")
+    @ApiImplicitParam(paramType = "path", name = "id", value = "产品ID", required = true, dataType = "string")
     @GetMapping(value = "/{id}")
-    public Result get(@PathVariable long id) {
+    public Result get(@PathVariable String id) {
         log.info("get with id:{}", id);
         return Result.success(productService.get(id));
     }
@@ -68,8 +66,7 @@ public class ProductController {
     @GetMapping
     public Result query(@RequestParam String name) {
         log.info("query with name:{}", name);
-        ProductQueryParam productQueryParam = new ProductQueryParam();
-        productQueryParam.setName(name);
+        ProductQueryParam productQueryParam = new ProductQueryParam(name);
         return Result.success(productService.query(productQueryParam));
     }
 
@@ -80,7 +77,7 @@ public class ProductController {
     )
     @PostMapping(value = "/conditions")
     public Result search(@Valid @RequestBody ProductQueryForm productQueryForm) {
-        log.info("search with productQueryForm:", productQueryForm);
+        log.info("search with productQueryForm:{}", productQueryForm);
         return Result.success(productService.query(productQueryForm.toParam(ProductQueryParam.class)));
     }
 }
